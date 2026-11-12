@@ -1,2 +1,3 @@
 # What's this (ANW)
-It is a bootloader that will loader the kernel of subaki (currently in i686 only)
+It is a bootloader that will loader the kernel of subaki (currently in i686 only)....
+was supposed to be the bootloader but now we are using 64 bit limine guide from osdev wiki.
