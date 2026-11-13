@@ -30,8 +30,11 @@ void Kmain(void) {
 
     }
 
-    klog("SubakiOS: Kernel intialized. \r\n");
-    klog("Frambuffy is UPPY");
+    klog_info("SubakiOS: Kernel intialized. \r\n");
+    klog_info("Frambuffy is UPPY");
+    klog_error("HI, I AM AN ERROR");
+    klog_warn("HI, THERE A LITTLE CUTESY WARNING... WHICH MIGHT NUKE THIS LATER");
+    
     fb_pattern(fb);
     hcf();
 }
