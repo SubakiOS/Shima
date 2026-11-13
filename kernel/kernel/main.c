@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "../arch/x86_64/framebuffer/framebuffer.h"
 #include "limine_boot.h"
+#include "../arch/x86_64/serial/serial.h"
 #include <string.h>
 
 
@@ -23,6 +24,12 @@ void Kmain(void) {
         hcf();
     }
 
+    if (init_serial() != 0) {
+        hcf();
+
+    }
+
+    serial_write_string("SubakiOS: Kernel intialized. \r\n");
     fb_pattern(fb);
     hcf();
 }
