@@ -4,6 +4,7 @@
 #include "../arch/x86_64/framebuffer/framebuffer.h"
 #include "limine_boot.h"
 #include "../arch/x86_64/serial/serial.h"
+#include "log/klog.h"
 #include <string.h>
 
 
@@ -29,7 +30,8 @@ void Kmain(void) {
 
     }
 
-    serial_write_string("SubakiOS: Kernel intialized. \r\n");
+    klog("SubakiOS: Kernel intialized. \r\n");
+    klog("Frambuffy is UPPY");
     fb_pattern(fb);
     hcf();
 }
