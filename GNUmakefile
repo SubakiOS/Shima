@@ -78,7 +78,8 @@ override CFLAGS += \
 
 # Internal C preprocessor flags that should not be changed by the user.
 override CPPFLAGS := \
-    -I src \
+    -I kernel/include \
+    -I kernel/boot/limine \
     $(CPPFLAGS) \
     -MMD \
     -MP
@@ -87,7 +88,8 @@ override CPPFLAGS := \
 override NASMFLAGS := \
     -f elf64 \
     $(patsubst -g,-g -F dwarf,$(NASMFLAGS)) \
-    -i src/ \
+    -I kernel/include \
+    -i kernel/boot/limine \
     -Wall
 
 # Internal linker flags that should not be changed by the user.
@@ -110,7 +112,7 @@ endif
 
 # Use "find" to glob all *.c, *.S, and *.asm files in the tree and obtain the
 # object and header dependency file names.
-override SRCFILES := $(shell find -L src -type f 2>/dev/null | LC_ALL=C sort)
+override SRCFILES := $(shell find -L kernel -type f 2>/dev/null | LC_ALL=C sort)
 override CFILES := $(filter %.c,$(SRCFILES))
 override ASFILES := $(filter %.S,$(SRCFILES))
 override NASMFILES := $(filter %.asm,$(SRCFILES))
