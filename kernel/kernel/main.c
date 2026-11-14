@@ -7,6 +7,7 @@
 #include "log/klog.h"
 #include "panic/panic.h"
 #include "panic/kassert.h"
+#include "../arch/x86_64/gdt/gdt.h"
 #include <string.h>
 
 
@@ -27,7 +28,9 @@ void Kmain(void) {
         hcf();
 
     }
-
+    klog_info("GDT START BEGIN");
+    gdt_init();
+    klog_info("GDT INTIALIZED");
     // panic("PWEEEE PWEEE A KERNUL PANICCCCCCC");
 
     klog_info("SubakiOS: Kernel intialized. \r\n");

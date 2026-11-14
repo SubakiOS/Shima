@@ -5,7 +5,8 @@ ENTRY(Kmain)
 PHDRS
 {
     requests PT_LOAD FLAGS(6);
-    kernel PT_LOAD FLAGS(5);
+    kernel PT_LOAD FLAGS(7);
+
 }
 
 SECTIONS
@@ -28,11 +29,13 @@ SECTIONS
         *(.rodata .rodata.*)
     } :kernel
 
-    .data : {
+    . = ALIGN(CONSTANT(MAXPAGESIZE));
+
+    .data : ALIGN(CONSTANT(MAXPAGESIZE)) {
         *(.data .data.*)
     } :kernel
 
-    .bss : {
+    .bss (NOLOAD) : ALIGN(16) {
         *(.bss .bss.*)
         *(COMMON)
     } :kernel
