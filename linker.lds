@@ -5,7 +5,8 @@ ENTRY(Kmain)
 PHDRS
 {
     requests PT_LOAD FLAGS(6);
-    kernel PT_LOAD FLAGS(7);
+    kernel PT_LOAD FLAGS(5);
+    writable PT_LOAD FLAGS(6);
 
 }
 
@@ -31,14 +32,18 @@ SECTIONS
 
     . = ALIGN(CONSTANT(MAXPAGESIZE));
 
-    .data : ALIGN(CONSTANT(MAXPAGESIZE)) {
+    .data :  {
         *(.data .data.*)
-    } :kernel
+        *(.got .got.*)
+        *(.got.plt)
+        *(.igot.plt)
+        BYTE(0)
+    } :writable
 
-    .bss (NOLOAD) : ALIGN(16) {
+    .bss (NOLOAD) : {
         *(.bss .bss.*)
         *(COMMON)
-    } :kernel
+    } :writable
 
     /DISCARD/ : {
         *(.eh_frame*)
