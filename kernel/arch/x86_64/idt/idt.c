@@ -43,6 +43,24 @@ extern void isr28(void);
 extern void isr29(void);
 extern void isr30(void);
 extern void isr31(void);
+extern void irq32(void);
+extern void irq33(void);
+extern void irq34(void);
+extern void irq35(void);
+extern void irq36(void);
+extern void irq37(void);
+extern void irq38(void);
+extern void irq39(void);
+extern void irq40(void);
+extern void irq41(void);
+extern void irq42(void);
+extern void irq43(void);
+extern void irq44(void);
+extern void irq45(void);
+extern void irq46(void);
+extern void irq47(void);
+
+
 
 
 static void (*const exception_handlers[32])(void) = {
@@ -50,6 +68,13 @@ static void (*const exception_handlers[32])(void) = {
     isr8, isr9, isr10, isr11, isr12, isr13, isr14, isr15,
     isr16, isr17, isr18, isr19, isr20, isr21, isr22, isr23,
     isr24, isr25, isr26, isr27, isr28, isr29, isr30, isr31
+};
+
+static void (*const irq_stubs[16])(void) = {
+    irq32, irq33, irq34, irq35,
+    irq36, irq37, irq38, irq39,
+    irq40, irq41, irq42, irq43,
+    irq44, irq45, irq46, irq47
 };
 
 static void idt_set_gate(
@@ -78,11 +103,20 @@ void idt_init(void) {
             0x8E,
             0
         );
+    }
+      for (uint8_t i = 0; i < 16; i++) {
+        idt_set_gate( 
+            32 + i,
+            (uint64_t)(uintptr_t)irq_stubs[i],
+            0x08,
+            0x8E,
+            0
+        );
+    }
 
         struct IDTPointer idtr = {
             .limit = sizeof(idt) - 1,
             .base = (uint64_t)(uintptr_t)&idt
         };
         idt_load(&idtr);
-    }
 };
