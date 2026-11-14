@@ -8,6 +8,7 @@
 #include "panic/panic.h"
 #include "panic/kassert.h"
 #include "../arch/x86_64/gdt/gdt.h"
+#include "../arch/x86_64/idt/idt.h"
 #include <string.h>
 
 
@@ -28,10 +29,20 @@ void Kmain(void) {
         hcf();
 
     }
-    klog_info("GDT START BEGIN");
+    klog_info("GDT & IDT START BEGIN");
     gdt_init();
-    klog_info("GDT INTIALIZED");
+    idt_init();
+    klog_info("GDT & IDT INTIALIZED");
     // panic("PWEEEE PWEEE A KERNUL PANICCCCCCC");
+
+    klog_warn("test gpf init");
+    asm volatile (
+        "mov $0xFFFF, %%ax\n\t"
+        "mov %%ax, %%ds"
+        :
+        :
+        : "rax", "memory"
+    );
 
     klog_info("SubakiOS: Kernel intialized. \r\n");
     klog_info("Frambuffy is UPPY");

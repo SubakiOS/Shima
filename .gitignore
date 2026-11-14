@@ -5,3 +5,4 @@ limine-binary
 *.iso_root
 *.tar.gz
 obj
+*.iso
