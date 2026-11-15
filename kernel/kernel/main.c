@@ -226,7 +226,11 @@ uint8_t irr = inb(0x20);
 
 klog_info(irr & 1 ? "PIT IRQ pending" : "No PIT IRQ pending");
  
+
 irq_register_handler(0, timer_irq_handler);
+irq_unregister_handler(0);
+
+
     asm volatile ("sti");
 
     uint64_t flags;
