@@ -22,6 +22,10 @@ volatile uint64_t irq_entry_count = 0;
         return;
     }
 
+    if (irq == 0) {
+        irq_debug_count++;
+    }
+
     if (irq_handlers[irq] != 0) {
         irq_handlers[irq]();
     }

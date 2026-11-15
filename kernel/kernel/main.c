@@ -23,6 +23,12 @@ static void hcf(void) {
     }
 }
 
+volatile uint64_t irq0_address = 0;
+volatile uint64_t irq0_callback_count = 0;
+
+static void timer_irq_handler(void) {
+    irq0_callback_count++;
+}
 // kern entry pint
 
 void Kmain(void) {
@@ -219,7 +225,8 @@ void Kmain(void) {
 uint8_t irr = inb(0x20);
 
 klog_info(irr & 1 ? "PIT IRQ pending" : "No PIT IRQ pending");
-
+ 
+irq_register_handler(0, timer_irq_handler);
     asm volatile ("sti");
 
     uint64_t flags;
@@ -229,9 +236,21 @@ klog_info((flags & (1ULL << 9))
     ? "CPU interrupts ENABLED"
     : "CPU interrupts DISABLED");
 
+    
+
 for (;;) {
-    if (irq_entry_count >= 100) {
-        klog_info("IRQ assembly entry received 100 interrupts!");
+    if (irq_entry_count >= 10000) {
+        klog_info("IRQ assembly entry received 10000 interrupts!");
+        serial_write_string("Asssembly enteries");
+        serial_write_hex(irq_entry_count);
+
+        serial_write_string("\nC dispatches: ");
+        serial_write_hex(irq_debug_count);
+
+        serial_write_string("\nC callbacks: ");
+        serial_write_hex(irq0_callback_count);
+
+        serial_write_string("\n");
         hcf();
     }
 
