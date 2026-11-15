@@ -15,8 +15,9 @@ void irq_register_handler(uint8_t irq, irq_handler_t handler) {
 }
 
 volatile uint64_t irq_debug_count = 0;
+volatile uint64_t irq_entry_count = 0;
   void irq_dispatch(uint64_t irq) {
-    irq_debug_count++;
+    
     if (irq >= 16) {
         return;
     }

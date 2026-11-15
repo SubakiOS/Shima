@@ -2,11 +2,16 @@
 .code64
 
 .extern irq_dispatch
+.extern irq_entry_count
+
 
 .macro IRQ num
 .global irq\num
 
 irq\num:
+    .if \num == 32
+        incq irq_entry_count(%rip)
+    .endif
     pushq $0
     pushq $\num
     jmp irq_common_handler

@@ -55,3 +55,13 @@ void serial_write_string(const char *str) {
         str++;
     }
 }
+
+void serial_write_hex(uint64_t value) {
+    const char hex[] = "0123456789ABCDEF";
+
+    serial_write_string("0x");
+
+    for (int i = 60; i >= 0; i -= 4) {
+        write_serial(hex[(value >> i) & 0xF]);
+    }
+}

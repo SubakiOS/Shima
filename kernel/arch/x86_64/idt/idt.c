@@ -1,4 +1,5 @@
 #include "idt.h"
+#include "../../../kernel/log/klog.h"
 
 #define IDT_ENTRIES 256
 
@@ -95,6 +96,8 @@ static void idt_set_gate(
 
 
 void idt_init(void) {
+
+
     for (uint8_t i = 0; i < 32; i++) {
         idt_set_gate( 
             i,
@@ -114,9 +117,32 @@ void idt_init(void) {
         );
     }
 
+    uint64_t irq0_address =
+        (uint64_t)idt[32].offset_1 |
+        ((uint64_t)idt[32].offset_2 << 16) |
+        ((uint64_t)idt[32].offset_3 << 32);
+
+    klog_info(irq0_address == (uint64_t)(uintptr_t)irq32
+        ? "IRQ0 IDT address OK"
+        : "IRQ0 IDT address WRONG");
+
         struct IDTPointer idtr = {
             .limit = sizeof(idt) - 1,
             .base = (uint64_t)(uintptr_t)&idt
         };
+
+    
         idt_load(&idtr);
+
+        struct IDTPointer loaded_idtr;
+
+asm volatile("sidt %0" : "=m"(loaded_idtr));
+
+klog_info(loaded_idtr.base == idtr.base
+    ? "LOADED IDT BASE OK"
+    : "LOADED IDT BASE WRONG");
+
+klog_info(loaded_idtr.limit == idtr.limit
+    ? "LOADED IDT LIMIT OK"
+    : "LOADED IDT LIMIT WRONG");
 };
