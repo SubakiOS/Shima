@@ -10,6 +10,8 @@ void irq_dispatch(uint64_t irq);
 extern volatile uint64_t irq_debug_count;
 extern volatile uint64_t irq_entry_count;
 void irq_unregister_handler(uint8_t irq);
+void irq_mask(uint8_t irq);
+void irq_unmask(uint8_t irq);
 
 
 #endif

@@ -1,5 +1,6 @@
 #include "irq.h"
 #include "../../io/io.h"
+#include "../pic/pic.h"
 
 #define PIC1_COMMAND 0x20
 #define PIC2_COMMAND 0xA0
@@ -21,6 +22,16 @@ void irq_unregister_handler(uint8_t irq) {
 
     irq_handlers[irq] = 0;
 }
+
+
+void irq_mask(uint8_t irq) {
+    pic_set_mask(irq);
+}
+
+void irq_unmask(uint8_t irq) {
+    pic_clear_mask(irq);
+}
+
 volatile uint64_t irq_debug_count = 0;
 volatile uint64_t irq_entry_count = 0;
   void irq_dispatch(uint64_t irq) {

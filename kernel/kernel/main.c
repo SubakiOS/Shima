@@ -230,6 +230,10 @@ klog_info(irr & 1 ? "PIT IRQ pending" : "No PIT IRQ pending");
 irq_register_handler(0, timer_irq_handler);
 irq_unregister_handler(0);
 
+    irq_unmask(0);
+    serial_write_string("PIC mask: ");
+    serial_write_hex(inb(0x21));
+    serial_write_string("\n");
 
     asm volatile ("sti");
 
@@ -243,7 +247,7 @@ klog_info((flags & (1ULL << 9))
     
 
 for (;;) {
-    if (irq_entry_count >= 10000) {
+    if (irq_entry_count >= 100) {
         klog_info("IRQ assembly entry received 10000 interrupts!");
         serial_write_string("Asssembly enteries");
         serial_write_hex(irq_entry_count);

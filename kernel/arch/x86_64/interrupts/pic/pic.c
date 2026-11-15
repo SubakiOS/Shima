@@ -1,6 +1,5 @@
 #include "pic.h"
 #include "../../io/io.h"
-#include "../irq/irq.h"
 
 #define PIC1_COMMAND 0x20
 #define PIC1_DATA 0x21
@@ -51,4 +50,16 @@ void pic_clear_mask(uint8_t irq) {
         mask = inb(PIC1_DATA);
         outb(PIC1_DATA, mask & ~(1 << 2));
     }
+}
+
+void pic_set_mask(uint8_t irq) {
+    if (irq >= 16) {
+        return;
+    }
+
+    uint16_t port = (irq < 8) ? PIC1_DATA : PIC2_DATA;
+    uint8_t line = irq % 8;
+
+    uint8_t mask = inb(port);
+    outb(port, mask | (1U << line));
 }
