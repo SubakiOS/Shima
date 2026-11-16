@@ -1,6 +1,7 @@
 #ifndef TERMINAL_H
 #define TERMINAL_H
 
+
 #include <stdint.h>
 #include <stddef.h>
 #include <limine.h>
@@ -25,4 +26,7 @@ struct terminal {
 int terminal_init(struct limine_framebuffer *fb, 
                   struct limine_file *font);
 
+void terminal_putchar(char c);
+
+void terminal_write(const char *str);
 #endif

@@ -14,7 +14,7 @@
 #include "../arch/x86_64/interrupts/irq/irq.h"
 #include "../arch/x86_64/tss/tss.h"
 #include "../arch/x86_64/io/io.h"
-#include "../../terminal/terminal.h"
+#include "../terminal/terminal.h"
 #include <string.h>
 
 
@@ -244,7 +244,11 @@ void Kmain(void) {
     klog_error("HI, I AM AN ERROR");
     klog_warn("HI, THERE A LITTLE CUTESY WARNING... WHICH MIGHT NUKE THIS LATER");
     kassert(fb != NULL, "Framebuffer is NULL");
-    fb_pattern(fb);
+    for (uint32_t y = 0; y < fb->height; y++) {
+        for (uint32_t x = 0; x < fb->width; x++) {
+            fb_put_pixel(fb, x ,y, 0, 0, 0);
+        }
+    }
     
     struct limine_file *font = limine_get_font();
 
@@ -252,8 +256,13 @@ void Kmain(void) {
         klog_error("termianl init failed");
     } else {
         klog_info("terminal init success");
+        terminal_write("WELCOME TO SUBAKI OS~~~!\n");
+        terminal_write("version 0.1\n");
+        terminal_write("More coming soon!");
+      
     }
-
+    
+    
     if (font == NULL) {
         klog_error("Font module not found");
     } else {

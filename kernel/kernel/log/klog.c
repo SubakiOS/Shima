@@ -1,5 +1,6 @@
 #include "klog.h"
 #include "../../arch/x86_64/serial/serial.h"
+#include "../../terminal/terminal.h"
 
 static void klog_level(const char *level, const char *message) {
     serial_write_string("[");
@@ -7,6 +8,13 @@ static void klog_level(const char *level, const char *message) {
     serial_write_string("] [SubakiOS] ");
     serial_write_string(message);
     serial_write_string("\r\n");
+
+     terminal_write("\n");
+    terminal_write("[");
+    terminal_write(level);
+    terminal_write("] [SubakiOS] ");
+    terminal_write(message);
+    terminal_write("\n");
 }
 //
 // void klog(const char *message) {
