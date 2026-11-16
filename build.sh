@@ -10,7 +10,8 @@ mkdir -p iso_root
 
 # Copy the relevant files over.
 mkdir -p iso_root/boot
-cp -v bin/subaki iso_root/boot/
+cp -v bin/subaki  iso_root/boot/
+cp -v assets/fonts/cp850-8x16.psf iso_root/boot/
 mkdir -p iso_root/boot/limine
 cp -v limine.conf limine-binary/limine-bios.sys limine-binary/limine-bios-cd.bin \
       limine-binary/limine-uefi-cd.bin iso_root/boot/limine/

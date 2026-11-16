@@ -14,6 +14,7 @@
 #include "../arch/x86_64/interrupts/irq/irq.h"
 #include "../arch/x86_64/tss/tss.h"
 #include "../arch/x86_64/io/io.h"
+#include "../../terminal/terminal.h"
 #include <string.h>
 
 
@@ -245,6 +246,46 @@ void Kmain(void) {
     kassert(fb != NULL, "Framebuffer is NULL");
     fb_pattern(fb);
     
+    struct limine_file *font = limine_get_font();
+
+    if (terminal_init(fb, font) != 0) {
+        klog_error("termianl init failed");
+    } else {
+        klog_info("terminal init success");
+    }
+
+    if (font == NULL) {
+        klog_error("Font module not found");
+    } else {
+        klog_error("Font module found");
+
+        serial_write_string("Font size: ");
+        serial_write_hex(font->size);
+        serial_write_string("\r\n");
+
+        const uint8_t *magic = font->address;
+
+        if (magic[0] == 0x36 && magic[1] == 0x04) {
+            klog_info("PSF1 magic validated");
+        } else {
+            klog_error("Invalid PSF1 magic");
+        }
+    }
+    
+    serial_write_string("Frmbuf: ");
+    serial_write_hex(fb->width);
+    serial_write_string(" x ");
+    serial_write_hex(fb->height);
+    serial_write_string("\r\n");
+
+    serial_write_string("Pitch ");
+    serial_write_hex(fb->pitch);
+    serial_write_string("\r\n");
+
+    serial_write_string("BPP: ");
+    serial_write_hex(fb->bpp);
+    serial_write_string("\r\n");
+
     klog_info("PIT initzd. Enabling intups");
     outb(0x20, 0x0A);
 uint8_t irr = inb(0x20);

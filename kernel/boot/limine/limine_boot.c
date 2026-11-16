@@ -14,14 +14,14 @@ static volatile struct limine_framebuffer_request framebuffer_request = {
 __attribute__((used, section(".limine_requests")))
 static volatile struct limine_hhdm_request hhdm_request = {
     .id = LIMINE_HHDM_REQUEST_ID,
-    .revision = 0
+    .revision = 0,
 
 };
 
 __attribute((used, section(".limine_requests")))
 static volatile struct limine_memmap_request memmap_request = {
     .id = LIMINE_MEMMAP_REQUEST_ID,
-    .revision = 0
+    .revision = 0,
 };
 
 __attribute__((used, section(".limine_requests")))
@@ -33,6 +33,11 @@ static volatile struct limine_paging_mode_request paging_mode_request = {
     .min_mode = LIMINE_PAGING_MODE_X86_64_4LVL
 };
 
+__attribute__((used, section(".limine_requests")))
+static volatile struct limine_module_request module_request = {
+    .id = LIMINE_MODULE_REQUEST_ID,
+    .revision = 0,
+};
 
 __attribute__((used, section(".limine_requests_start")))
 static volatile uint64_t limine_requests_start_marker[] = 
@@ -41,6 +46,7 @@ LIMINE_REQUESTS_START_MARKER;
 __attribute__((used, section(".limine_requests_end")))
 static volatile uint64_t limine_requests_end_marker[] =
 LIMINE_REQUESTS_END_MARKER;
+
 
 struct limine_framebuffer *limine_get_framebuffer(void) {
     if  (!LIMINE_BASE_REVISION_SUPPORTED(limine_base_revision)) {
@@ -80,4 +86,45 @@ struct limine_memmap_response *limine_get_memmap(void) {
     }
 
     return memmap_request.response;
+}
+struct limine_file *limine_get_font(void) {
+    if (module_request.response == NULL ||
+        module_request.response->module_count == 0) {
+        return NULL;
+    }
+
+    for (uint64_t i = 0; i < module_request.response->module_count; i++) {
+        struct limine_file *file = module_request.response->modules[i];
+
+        if (file == NULL || file->path == NULL) {
+            continue;
+        }
+
+        const char *path = file->path;
+        const char target[] = "cp850-8x16.psf";
+
+        size_t path_len = 0;
+        size_t target_len = sizeof(target) - 1;
+
+        while (path[path_len] != '\0') {
+            path_len++;
+        }
+
+        if (path_len < target_len) {
+            continue;
+        }
+
+        size_t j = 0;
+
+        while (j < target_len &&
+               path[path_len - target_len + j] == target[j]) {
+            j++;
+        }
+
+        if (j == target_len) {
+            return file;
+        }
+    }
+
+    return NULL;
 }

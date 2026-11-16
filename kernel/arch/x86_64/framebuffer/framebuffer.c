@@ -15,6 +15,18 @@ static uint32_t fb_pixel(struct limine_framebuffer *fb, uint8_t red, uint8_t gre
 
 }
 
+void fb_put_pixel(struct limine_framebuffer *fb,
+                  uint32_t x, uint32_t y,
+                  uint8_t red, uint8_t green, uint8_t blue) {
+                    if (fb == NULL || x >= fb->width || y >= fb->height)
+                    return;
+
+                    volatile uint32_t *fb_ptr = fb->address;
+
+                    fb_ptr[y * (fb->pitch / 4) + x] = 
+                          fb_pixel(fb, red, green, blue);
+}
+
 void fb_pattern(struct limine_framebuffer *fb) {
     volatile uint32_t *fb_ptr = fb->address;
 
