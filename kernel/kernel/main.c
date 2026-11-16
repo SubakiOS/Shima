@@ -311,7 +311,7 @@ irq_unregister_handler(0);
     serial_write_hex(inb(0x21));
     serial_write_string("\n");
 
-    asm volatile ("sti");
+    // asm volatile ("sti");
 
     uint64_t flags;
 asm volatile("pushfq; popq %0" : "=r"(flags));
@@ -323,19 +323,19 @@ klog_info((flags & (1ULL << 9))
     
 
 for (;;) {
-    if (irq_entry_count >= 100) {
-        klog_info("IRQ assembly entry received 100 interrupts!");
-        serial_write_string("Asssembly enteries");
-        serial_write_hex(irq_entry_count);
-
-        serial_write_string("\nC dispatches: ");
-        serial_write_hex(irq_debug_count);
-
-        serial_write_string("\nC callbacks: ");
-        serial_write_hex(irq0_callback_count);
-
-        serial_write_string("\n");
-        hcf();
+    // if (irq_entry_count >= 100) {
+    //    klog_info("IRQ assembly entry received 100 interrupts!");
+    //    serial_write_string("Asssembly enteries");
+    //    serial_write_hex(irq_entry_count);
+    //
+    //    serial_write_string("\nC dispatches: ");
+    //    serial_write_hex(irq_debug_count);
+    //
+    //    serial_write_string("\nC callbacks: ");
+    //    serial_write_hex(irq0_callback_count);
+    //
+    //    serial_write_string("\n");
+    //  hcf();
     }
 
     
