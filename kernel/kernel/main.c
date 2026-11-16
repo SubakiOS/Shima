@@ -12,6 +12,7 @@
 #include "../arch/x86_64/interrupts/pic/pic.h"
 #include "../arch/x86_64/pit/pit.h"
 #include "../arch/x86_64/interrupts/irq/irq.h"
+#include "../arch/x86_64/tss/tss.h"
 #include "../arch/x86_64/io/io.h"
 #include <string.h>
 
@@ -30,7 +31,28 @@ static void timer_irq_handler(void) {
     irq0_callback_count++;
 }
 // kern entry pint
+__attribute__((noinline))
+static void test_divide_by_zero(void) {
+    volatile int a = 10;
+    volatile int b = 0;
+    volatile int result;
 
+    asm volatile(
+        "idivl %2"
+        : "=a"(result)
+        : "a"(a), "r"(b), "d"(0)
+        : "cc"
+    );
+}
+
+__attribute__((noinline))
+static void test_page_fault(void) {
+    volatile uint64_t *ptr = 
+    (volatile uint64_t *)0x0000400000000000ULL;
+
+    volatile uint64_t value = *ptr;
+    (void)value;
+}
 void Kmain(void) {
 
     asm volatile ("cli");
@@ -154,6 +176,9 @@ void Kmain(void) {
     //: "LVT0 delivery mode is NOT ExtINT");
     klog_info("GDT & IDT START BEGIN");
     gdt_init();
+    serial_write_string("IST1 stack top:");
+    serial_write_hex(tss_get_ist1());
+    serial_write_string("\r\n");
     idt_init();
     struct limine_memmap_response  *memmap = limine_get_memmap();
 
@@ -230,6 +255,7 @@ klog_info(irr & 1 ? "PIT IRQ pending" : "No PIT IRQ pending");
 irq_register_handler(0, timer_irq_handler);
 irq_unregister_handler(0);
 
+
     irq_unmask(0);
     serial_write_string("PIC mask: ");
     serial_write_hex(inb(0x21));
@@ -248,7 +274,7 @@ klog_info((flags & (1ULL << 9))
 
 for (;;) {
     if (irq_entry_count >= 100) {
-        klog_info("IRQ assembly entry received 10000 interrupts!");
+        klog_info("IRQ assembly entry received 100 interrupts!");
         serial_write_string("Asssembly enteries");
         serial_write_hex(irq_entry_count);
 
@@ -262,6 +288,7 @@ for (;;) {
         hcf();
     }
 
+    
     asm volatile("hlt");
 }
 }

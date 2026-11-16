@@ -1,4 +1,5 @@
 #include  "gdt.h"
+#include "../tss/tss.h"
 
 struct gdt_entry {
     uint16_t limit_low;
@@ -14,7 +15,19 @@ struct gdt_pointer {
     uint64_t base;
 } __attribute__((packed));
 
-static struct gdt_entry gdt[3];
+static struct gdt_entry gdt[5];
+struct tss_descriptor {
+    uint16_t limit_low;
+    uint16_t base_low;
+    uint8_t base_middle;
+    uint8_t access;
+    uint8_t flags;
+    uint8_t base_high;
+    uint32_t base_upper;
+    uint32_t reserved;
+} __attribute__((packed));
+
+_Static_assert(sizeof(struct tss_descriptor) == 16, "TSS descriptor must be 16 bytes");
 static struct gdt_pointer gdtr;
 
 static void gdt_set_entry(
@@ -32,6 +45,19 @@ static void gdt_set_entry(
     gdt[index].base_high = (base >> 24) & 0xFF;
 }
 
+static void gdt_set_tss(int index, uint64_t base, uint32_t limit) {
+    struct tss_descriptor *desc = 
+    (struct tss_descriptor *)&gdt[index];
+
+    desc->limit_low = limit & 0xFFFF;
+    desc->base_low = base & 0xFFFF;
+    desc->base_middle = (base >> 16) & 0xFF;
+    desc->access =  0x89;
+    desc->flags = (limit >> 16) & 0x0F;
+    desc->base_high = (base >> 24) & 0xFF;
+    desc->base_upper = (base >> 32) & 0xFFFFFFFF;
+    desc->reserved = 0; 
+}
 extern void gdt_load(struct gdt_pointer *ptr);
 
 void gdt_init(void) {
@@ -42,5 +68,14 @@ void gdt_init(void) {
     gdtr.limit = sizeof(gdt) - 1;
     gdtr.base = (uint64_t)&gdt;
 
+    tss_init();
+
+    gdt_set_tss(
+        3,
+        (uint64_t)tss_get(),
+        sizeof(struct tss) - 1
+    );
+    
     gdt_load(&gdtr);
 }
+

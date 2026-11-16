@@ -1,6 +1,7 @@
 #include "idt.h"
-#include "../../kernel/log/klog.h"
-#include "../../kernel/panic/panic.h"
+#include "../../../kernel/log/klog.h"
+#include "../../../kernel/panic/panic.h"
+#include "../../arch/x86_64/serial/serial.h"
 
 static const char *exception_name(uint64_t vector) {
     switch (vector) {
@@ -33,6 +34,66 @@ static const char *exception_name(uint64_t vector) {
 
 __attribute__((noreturn))
 void isr_handler(struct InterruptFrame *frame) {
+
+    uint64_t current_rsp;
+    asm volatile ("mov %%rsp, %0" : "=r"(current_rsp));
+
     klog_error(exception_name(frame->vector));
-    panic("Unhandeled CPU exception");
+    if (frame->vector == 8) {
+        serial_write_string("Double fault: ist1 handler reached\r\n");
+        serial_write_string("RSP:");
+        serial_write_hex(current_rsp);
+        serial_write_string("\r\n");
+    }
+    
+    serial_write_string("Exception vector: ");
+    serial_write_hex(frame->vector);
+    serial_write_string("\r\n");
+
+    serial_write_string("Weerror code: ");
+    serial_write_hex(frame->error_code);
+    serial_write_string("\r\n");
+
+    serial_write_string("RIP: ");
+    serial_write_hex(frame->rip);
+    serial_write_string("\r\n");
+
+
+    if (frame->vector == 14) {
+    uint64_t cr2;
+
+    asm volatile("mov %%cr2, %0" : "=r"(cr2));
+
+    serial_write_string("Page fault address (CR2): ");
+    serial_write_hex(cr2);
+    serial_write_string("\r\n");
+
+    serial_write_string("Page fauly error code: ");
+    serial_write_hex(frame->error_code);
+    serial_write_string("\r\n");
+
+    if (frame->error_code & (1ULL << 0))
+        serial_write_string("Protection violation\r\n");
+    else
+        serial_write_string("Page not present\r\n");
+
+    if (frame->error_code & (1ULL << 1))
+    serial_write_string("Write access\r\n");
+    else
+    serial_write_string("Read access\r\n");
+
+    if (frame->error_code & (1ULL << 2))
+    serial_write_string("User-mode access\r\n");
+    else 
+    serial_write_string("Supervisor-mode access\r\n");
+
+    if (frame->error_code & (1ULL << 3))
+        serial_write_string("Reserved-bit violation\r\n");
+
+    if (frame->error_code & (1ULL << 4))
+    serial_write_string("Instruction fetch\r\n");
+
 }
+  panic("Unhandeled CPU exception");
+}
+

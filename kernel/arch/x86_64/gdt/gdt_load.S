@@ -16,6 +16,9 @@ gdt_load:
    movw %ax, %es
    movw %ax, %ss
 
+   mov $0x18, %ax
+   ltr %ax
+
    ret
 
 .size gdt_load, .-gdt_load

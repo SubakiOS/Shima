@@ -94,7 +94,18 @@ static void idt_set_gate(
     idt[vector].zero = 0;
 }
 
+__attribute__((noreturn))
+void idt_test_double_fault(void) {
+    asm volatile ("cli");
 
+    idt[13].selector = 0x28;
+
+    asm volatile ("int $13");
+
+    for (;;) {
+        asm volatile ("cli; hlt");
+    }
+}
 void idt_init(void) {
 
 
@@ -104,7 +115,7 @@ void idt_init(void) {
             (uint64_t)(uintptr_t)exception_handlers[i],
             0x08,
             0x8E,
-            0
+            (i == 8) ? 1 : 0
         );
     }
       for (uint8_t i = 0; i < 16; i++) {

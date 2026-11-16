@@ -46,4 +46,6 @@ struct InterruptFrame {
     uint64_t rflags;
 };
 
+void idt_test_double_fault(void);
+
 #endif
